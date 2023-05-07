@@ -11,9 +11,14 @@ class DBHelper {
       onCreate: (db, version) {
         db.execute('CREATE TABLE IF NOT EXISTS pdfs(id TEXT PRIMARY KEY ,'
             ' path TEXT,'
-            ' title TEXT)');
+            ' title TEXT, '
+            ' author TEXT )'
+            );
       },
-      version: 1,
+      onUpgrade: (db, a, b) {
+          db.execute('ALTER TABLE pdfs ADD author TEXT;');
+      },
+      version: 2,
     );
   }
 

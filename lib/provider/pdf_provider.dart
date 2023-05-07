@@ -7,8 +7,9 @@ class PDF {
   final String id;
   final String path;
   final String title;
+  final String author;
 
-  PDF({required this.id, required this.path, required this.title});
+  PDF({required this.id, required this.path, required this.title, required this.author});
 }
 
 class PDFProvider extends ChangeNotifier {
@@ -17,17 +18,19 @@ class PDFProvider extends ChangeNotifier {
 
   Future insertDatabase(
     String path,
-    String title
+    String title,
+    String author
   ) async {
     final newProduct = PDF(
-      id: const Uuid().v1(), path: path, title: title,
+      id: const Uuid().v1(), path: path, title: title, author: author
     );
     _item.add(newProduct);
 
     await  DBHelper.insert('pdfs', {
       'id': newProduct.id,
       'path': newProduct.path,
-      'title': newProduct.title
+      'title': newProduct.title,
+      'author': newProduct.author
     });
 
     notifyListeners();
@@ -40,6 +43,7 @@ class PDFProvider extends ChangeNotifier {
               id: item['id'],
               path: item['path'], 
               title: item['title'],
+              author: item['author']
             ))
         .toList();
     return _item;

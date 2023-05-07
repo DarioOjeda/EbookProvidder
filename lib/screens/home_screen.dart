@@ -16,40 +16,44 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder(
-            future: Provider.of<PDFProvider>(context, listen: true).selectPDFs(),
-            builder: (context, snapshot) => 
-            snapshot.data != null ?             
-              CustomScrollView(
-                  primary: false,
-                  slivers: [         
-                    SliverPadding(
-                      padding: const EdgeInsets.all(15),
-                      sliver: SliverGrid.count(
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        crossAxisCount: 3,
-                        children: [
-                          for ( var i in snapshot.data! ) 
-                              GestureDetector(
-                                onTap: () {
-                                  Provider.of<PDFProvider>(context, listen: false).changeSelectedPDF(i.path);
-                                  Navigator.pushNamed(context, 'pdf_reader');
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(10.0),
-                                  color: Colors.red,
-                                  child: Text(i.title)
-                                ),
-                              )
-                        ],
+    return SafeArea(
+      child: Scaffold(
+        body: FutureBuilder(
+              future: Provider.of<PDFProvider>(context, listen: true).selectPDFs(),
+              builder: (context, snapshot) => 
+              snapshot.data != null ?             
+                CustomScrollView(
+                    primary: false,
+                    slivers: [         
+                      SliverPadding(
+                        padding: const EdgeInsets.all(15),
+                        sliver: SliverGrid.count(
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          crossAxisCount: 2,
+                          children: [
+                            for ( var i in snapshot.data! ) 
+                                GestureDetector(
+                                  onTap: () {
+                                    Provider.of<PDFProvider>(context, listen: false).changeSelectedPDF(i.path);
+                                    Navigator.pushNamed(context, 'pdf_reader');
+                                  },
+                                  child: Card(
+                                    child: ListTile(
+                                      title: Text(i.title),
+                                      subtitle: Text(i.author),
+                                    ),
+                                  ),
+                                )
+                          ],
+                        )
                       )
-                    )
-                  ])
-                : Text('')
-        ),
-   );
+                    ])
+                  : Text('')
+          ),
+          floatingActionButton: BotonSeleccionar(),
+       ),
+    );
   }
 }
 
@@ -60,8 +64,7 @@ class BotonSeleccionar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-            child: ElevatedButton(
+    return ElevatedButton(
               onPressed: () async {
             FilePickerResult? result = await FilePicker.platform.pickFiles(
               allowedExtensions: ['pdf'],
@@ -84,7 +87,7 @@ class BotonSeleccionar extends StatelessWidget {
                   Directory appDocDir = await getApplicationDocumentsDirectory();
                   await Directory('${appDocDir.path}/ebooks').create(recursive: true);
                   //ignore: use_build_context_synchronously
-                  await context.read<PDFProvider>().insertDatabase(v1 , doc.documentInformation.title);
+                  await context.read<PDFProvider>().insertDatabase(v1 , doc.documentInformation.title, doc.documentInformation.author);
       
                   await file.rename("${appDocDir.path}/ebooks/$v1.pdf");
                 }
@@ -101,7 +104,6 @@ class BotonSeleccionar extends StatelessWidget {
             }
           },
               child: Text('Selecciona un pdf'),
-    )
     );
   }
 }
