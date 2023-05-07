@@ -34,8 +34,8 @@ class HomeScreen extends StatelessWidget {
                           children: [
                             for ( var i in snapshot.data! ) 
                                 GestureDetector(
-                                  onTap: () {
-                                    Provider.of<PDFProvider>(context, listen: false).changeSelectedPDF(i.path);
+                                  onTap: () async {
+                                    await Provider.of<PDFProvider>(context, listen: false).changeSelectedPDF(i.path);
                                     Navigator.pushNamed(context, 'pdf_reader');
                                   },
                                   child: Card(

@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +19,7 @@ class PDF {
 
 class PDFProvider extends ChangeNotifier {
   List<PDF> _item = [];
-  PDF? selectedPDF = null;
+  PdfDocument? selectedPDF = null;
 
   Future insertDatabase(
     String path,
@@ -49,10 +54,16 @@ class PDFProvider extends ChangeNotifier {
     return _item;
   }
 
-  void changeSelectedPDF(uuid) {
-    selectedPDF = _item.firstWhere( (el) => el.path == uuid );
+  Future<void> changeSelectedPDF(uuid) async {
+    
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    File file = File("${appDocDir.path}/ebooks/$uuid.pdf");
+    final bytes = await file.readAsBytes();
+    selectedPDF = PdfDocument.fromBase64String(base64.encode(bytes));
+
   }
-  PDF? getSelectedPDF() {
+
+  PdfDocument? getSelectedPDF() {
     return selectedPDF;
   }
 }
