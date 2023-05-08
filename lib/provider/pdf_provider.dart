@@ -66,6 +66,11 @@ class PDFProvider extends ChangeNotifier {
   PdfDocument? getSelectedPDF() {
     return selectedPDF;
   }
+
+  Future<void> deleteAll() async{
+    await DBHelper.deleteAll();
+    notifyListeners();
+  }
 }
 
 

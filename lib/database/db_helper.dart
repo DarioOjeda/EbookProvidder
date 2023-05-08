@@ -75,4 +75,9 @@ class DBHelper {
     var select = await db.query('pdfs');
     return select;
   }
+
+  static Future<void> deleteAll() async{
+    final db = await DBHelper.database();
+    await db.delete("pdfs");
+  }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -21,35 +22,60 @@ class HomeScreen extends StatelessWidget {
         body: FutureBuilder(
               future: Provider.of<PDFProvider>(context, listen: true).selectPDFs(),
               builder: (context, snapshot) => 
-              snapshot.data != null ?             
-                CustomScrollView(
-                    primary: false,
-                    slivers: [         
-                      SliverPadding(
-                        padding: const EdgeInsets.all(15),
-                        sliver: SliverGrid.count(
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          crossAxisCount: 2,
-                          children: [
-                            for ( var i in snapshot.data! ) 
-                                GestureDetector(
-                                  onTap: () async {
-                                    await Provider.of<PDFProvider>(context, listen: false).changeSelectedPDF(i.path);
-                                    Navigator.pushNamed(context, 'pdf_reader');
-                                  },
-                                  child: Card(
-                                    child: ListTile(
-                                      title: Text(i.title),
-                                      subtitle: Text(i.author),
+              snapshot.data != null && snapshot.data!.length > 0 ?             
+                Stack(
+                  children: [
+                    CustomScrollView(
+                      primary: false,
+                      slivers: [         
+                        SliverPadding(
+                          padding: const EdgeInsets.all(15),
+                          sliver: SliverGrid.count(
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
+                            crossAxisCount: 2,
+                            children: [
+                              for ( var i in snapshot.data! ) 
+                                  GestureDetector(
+                                    onTap: () async {
+                                      await Provider.of<PDFProvider>(context, listen: false).changeSelectedPDF(i.path);
+                                      Navigator.pushNamed(context, 'pdf_reader');
+                                    },
+                                    child: Card(
+                                      child: ListTile(
+                                        title: Text(i.title),
+                                        subtitle: Text(i.author),
+                                      ),
                                     ),
-                                  ),
-                                )
-                          ],
+                                  )
+                            ],
+                          )
                         )
-                      )
-                    ])
-                  : Text('')
+                      ]),
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Padding(
+                          padding: EdgeInsets.all(15.0),
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              await Provider.of<PDFProvider>(context, listen: false).deleteAll();
+                              Fluttertoast.showToast(
+                                    msg: "PDFs borrados correctamente",
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.TOP_RIGHT,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0
+                                );
+                            },
+                            child: Text('Borrar todos los libros.')
+                            ),
+                        ),
+                     ),
+                    ]
+                )
+                  : Center(child: Text('Todavía no ha añadido ningún libro. Pulse el botón para añadir un PDF.'))
           ),
           floatingActionButton: BotonSeleccionar(),
        ),
